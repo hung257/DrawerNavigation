@@ -47,7 +47,7 @@ public class DienthoaiActivity extends AppCompatActivity {
     View footerview;
     boolean isloading = false;
     boolean limitdata = false;
-//    mHandler mHandler;
+    mHandler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +58,13 @@ public class DienthoaiActivity extends AppCompatActivity {
         GetIdDt();
         ActionToolbar();
         GetData(page);
+        LoadListViewData();
         LoadMoreData();
+        CatchItemOnLisView();
         
     }
 
-    private void LoadMoreData() {
+    private void CatchItemOnLisView() {
         lvdt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -71,24 +73,33 @@ public class DienthoaiActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
 
-//        lvdt.setOnScrollListener(new AbsListView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(AbsListView absListView, int i) {
-//
-//            }
-//
-//            @Override
-//            public void onScroll(AbsListView absListView, int FirstItem, int visibleItem, int TotalItem) {
-//                if(FirstItem + visibleItem == TotalItem && TotalItem != 0 && isloading == false && limitdata == false){
-//                    isloading = true;
-//                    ThreadData threadData = new ThreadData();
-//                    threadData.start();
-//                }
-//
-//
-//            }
-//        });
+    private void LoadMoreData() {
+
+        lvdt.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int i) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int FirstItem, int visibleItem, int TotalItem) {
+                if(FirstItem + visibleItem == TotalItem && TotalItem != 0 && isloading == false && limitdata == false){
+                    isloading = true;
+                    ThreadData threadData = new ThreadData();
+                    threadData.start();
+                }
+            }
+        });
+    }
+
+    private void LoadListViewData() {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        footerview = inflater.inflate(R.layout.progresbar,null);
+        mangdt = new ArrayList<>();
+        dienthoaiAdapter = new DienthoaiAdapter(getApplicationContext(),mangdt);
+        lvdt.setAdapter(dienthoaiAdapter);
     }
 
     private void GetData(int Pagee) {
@@ -167,41 +178,36 @@ public class DienthoaiActivity extends AppCompatActivity {
     private void AnhXa() {
         toolbardt = findViewById(R.id.toolbardienthoai);
         lvdt = findViewById(R.id.listviewdienthoai);
-        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        footerview = inflater.inflate(R.layout.progresbar,null);
-        mangdt = new ArrayList<>();
-        dienthoaiAdapter = new DienthoaiAdapter(getApplicationContext(),mangdt);
-        lvdt.setAdapter(dienthoaiAdapter);
 
-//        mHandler = new mHandler();
+        mHandler = new mHandler();
     }
-//    public class mHandler extends Handler{
-//        @Override
-//        public void handleMessage(@NonNull Message msg) {
-//            switch (msg.what){
-//                case 0:
-//                    lvdt.addFooterView(footerview);
-//                    break;
-//                case 1:
-//                    GetData(++page);
-//                    isloading = false;
-//                    break;
-//            }
-//            super.handleMessage(msg);
-//        }
-//    }
-//    public class ThreadData extends Thread {
-//        @Override
-//        public void run() {
-//            mHandler.sendEmptyMessage(0);
-//            try {
-//                Thread.sleep(3000);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
-//            Message message = mHandler.obtainMessage(1);
-//            mHandler.sendMessage(message);
-//            super.run();
-//        }
-//    }
+    public class mHandler extends Handler{
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what){
+                case 0:
+                    lvdt.addFooterView(footerview);
+                    break;
+                case 1:
+                    GetData(++page);
+                    isloading = false;
+                    break;
+            }
+            super.handleMessage(msg);
+        }
+    }
+    public class ThreadData extends Thread {
+        @Override
+        public void run() {
+            mHandler.sendEmptyMessage(0);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            Message message = mHandler.obtainMessage(1);
+            mHandler.sendMessage(message);
+            super.run();
+        }
+    }
 }
