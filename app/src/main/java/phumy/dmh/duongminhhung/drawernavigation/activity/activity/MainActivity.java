@@ -92,9 +92,45 @@ public class MainActivity extends AppCompatActivity {
                         drawerLayout.closeDrawer(GravityCompat.START);
                         break;
                     case 1:
-                        Intent intent = new Intent(MainActivity.this,DienthoaiActivity.class);
+                        if (CheckConnection.haveNetworkConnection(getApplicationContext())){
+                            Intent intent = new Intent(MainActivity.this,DienthoaiActivity.class);
+                            intent.putExtra("idloaisanpham",mangloaisp.get(i).getId());
+                            startActivity(intent);
+                        }else {
+                            CheckConnection.ShowToast_short(getApplicationContext(),"kiem tra internet");
+                        }
+
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case 2:
+                        if (CheckConnection.haveNetworkConnection(getApplicationContext())){
+                        Intent intent = new Intent(MainActivity.this,LapTopActivity.class);
                         intent.putExtra("idloaisanpham",mangloaisp.get(i).getId());
                         startActivity(intent);
+                        }else {
+                            CheckConnection.ShowToast_short(getApplicationContext(),"kiem tra internet");
+                        }
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case 3:
+                        if (CheckConnection.haveNetworkConnection(getApplicationContext())){
+                        Intent intent = new Intent(MainActivity.this,LienHeActivity.class);
+                        startActivity(intent);
+                        }else {
+                            CheckConnection.ShowToast_short(getApplicationContext(),"kiem tra internet");
+                        }
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                        break;
+
+                    case 4:
+                        if (CheckConnection.haveNetworkConnection(getApplicationContext())){
+                        Intent intent = new Intent(MainActivity.this,ThongTinActivity.class);
+                        startActivity(intent);
+                         }else {
+                             CheckConnection.ShowToast_short(getApplicationContext(),"kiem tra internet");
+                             }
                         drawerLayout.closeDrawer(GravityCompat.START);
                         break;
                 }
@@ -121,9 +157,9 @@ public class MainActivity extends AppCompatActivity {
                             ID = jsonObject.getInt("id");
                             Tensanpham = jsonObject.getString("tensp");
                             Giasanpham = jsonObject.getInt("giasp");
-                            Hinhsanpham = jsonObject.getString("hinhsp");
+                            Hinhsanpham = jsonObject.getString("hinhanhsp");
                             Motasanpham = jsonObject.getString("motasp");
-                            IDsanpham = jsonObject.getInt("idsp");
+                            IDsanpham = jsonObject.getInt("idsanpham");
 
                             mangsanpham.add(new Sanpham(ID,Tensanpham,Giasanpham,Hinhsanpham,Motasanpham,IDsanpham));
                             sanphamAdapter.notifyDataSetChanged();

@@ -1,10 +1,17 @@
 package phumy.dmh.duongminhhung.drawernavigation.activity.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.android.volley.AuthFailureError;
@@ -26,6 +33,7 @@ import java.util.Map;
 import phumy.dmh.duongminhhung.drawernavigation.R;
 import phumy.dmh.duongminhhung.drawernavigation.activity.adapter.DienthoaiAdapter;
 import phumy.dmh.duongminhhung.drawernavigation.activity.model.Sanpham;
+import phumy.dmh.duongminhhung.drawernavigation.activity.ultil.CheckConnection;
 import phumy.dmh.duongminhhung.drawernavigation.activity.ultil.Server;
 
 public class DienthoaiActivity extends AppCompatActivity {
@@ -36,6 +44,10 @@ public class DienthoaiActivity extends AppCompatActivity {
     ArrayList<Sanpham> mangdt;
     int iddt = 0;
     int page = 1;
+    View footerview;
+    boolean isloading = false;
+    boolean limitdata = false;
+//    mHandler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,15 +55,45 @@ public class DienthoaiActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dienthoai);
 
         AnhXa();
-        GetIdloaisp();
+        GetIdDt();
         ActionToolbar();
         GetData(page);
+        LoadMoreData();
         
     }
 
-    private void GetData(int Page) {
+    private void LoadMoreData() {
+        lvdt.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent intent = new Intent(getApplicationContext(),ChiTietSanPhamActivity.class);
+                intent.putExtra("thongtinsanpham",mangdt.get(i));
+                startActivity(intent);
+            }
+        });
+
+//        lvdt.setOnScrollListener(new AbsListView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(AbsListView absListView, int i) {
+//
+//            }
+//
+//            @Override
+//            public void onScroll(AbsListView absListView, int FirstItem, int visibleItem, int TotalItem) {
+//                if(FirstItem + visibleItem == TotalItem && TotalItem != 0 && isloading == false && limitdata == false){
+//                    isloading = true;
+//                    ThreadData threadData = new ThreadData();
+//                    threadData.start();
+//                }
+//
+//
+//            }
+//        });
+    }
+
+    private void GetData(int Pagee) {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-        String duongdan = Server.Duongdandienthoai+String.valueOf(Page);
+        String duongdan = Server.Duongdandienthoai+String.valueOf(Pagee);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, duongdan, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -62,14 +104,15 @@ public class DienthoaiActivity extends AppCompatActivity {
                 String Motadt = "";
                 int Idspdt = 0;
 
-                if (response !=null){
+                if (response !=null && response.length() !=2){
+                    lvdt.removeFooterView(footerview);
                     try {
                         JSONArray jsonArray = new JSONArray(response);
                         for (int i =0; i< jsonArray.length(); i++){
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
                             id = jsonObject.getInt("id");
                             Tendt = jsonObject.getString("tensp");
-                            Giadt = jsonObject.getInt("giadt");
+                            Giadt = jsonObject.getInt("giasp");
                             Hinhanhdt = jsonObject.getString("hinhanhsp");
                             Motadt = jsonObject.getString("motasp");
                             Idspdt = jsonObject.getInt("idsanpham");
@@ -80,6 +123,11 @@ public class DienthoaiActivity extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+
+                }else {
+                    limitdata = true;
+                    lvdt.removeFooterView(footerview);
+                    CheckConnection.ShowToast_short(getApplicationContext(),"Da het du lieu");
 
                 }
 
@@ -112,15 +160,48 @@ public class DienthoaiActivity extends AppCompatActivity {
         });
     }
 
-    private void GetIdloaisp() {
+    private void GetIdDt() {
         iddt = getIntent().getIntExtra("idloaisanpham",-1);
     }
 
     private void AnhXa() {
         toolbardt = findViewById(R.id.toolbardienthoai);
         lvdt = findViewById(R.id.listviewdienthoai);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        footerview = inflater.inflate(R.layout.progresbar,null);
         mangdt = new ArrayList<>();
         dienthoaiAdapter = new DienthoaiAdapter(getApplicationContext(),mangdt);
         lvdt.setAdapter(dienthoaiAdapter);
+
+//        mHandler = new mHandler();
     }
+//    public class mHandler extends Handler{
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//            switch (msg.what){
+//                case 0:
+//                    lvdt.addFooterView(footerview);
+//                    break;
+//                case 1:
+//                    GetData(++page);
+//                    isloading = false;
+//                    break;
+//            }
+//            super.handleMessage(msg);
+//        }
+//    }
+//    public class ThreadData extends Thread {
+//        @Override
+//        public void run() {
+//            mHandler.sendEmptyMessage(0);
+//            try {
+//                Thread.sleep(3000);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            Message message = mHandler.obtainMessage(1);
+//            mHandler.sendMessage(message);
+//            super.run();
+//        }
+//    }
 }

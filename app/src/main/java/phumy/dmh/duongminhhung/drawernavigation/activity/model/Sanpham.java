@@ -1,6 +1,8 @@
 package phumy.dmh.duongminhhung.drawernavigation.activity.model;
 
-public class Sanpham {
+import java.io.Serializable;
+
+public class Sanpham implements Serializable {
     public int ID;
     public String Tensanpham;
     public  Integer Giasanpham;

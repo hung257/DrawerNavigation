@@ -55,7 +55,7 @@ public class DienthoaiAdapter extends BaseAdapter {
             viewHolder = new ViewHolder();
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.dong_dienthoai,null);
-            viewHolder.txttendienthoai = view.findViewById(R.id.textviewtensanpham);
+            viewHolder.txttendienthoai = view.findViewById(R.id.textviewtendienthoai);
             viewHolder.txtgiadienthoai = view.findViewById(R.id.textviewgiadienthoai);
             viewHolder.txtmotadienthoai = view.findViewById(R.id.textviewmotadienthoai);
             viewHolder.imgdienthoai = view.findViewById(R.id.imageviewdienthoai);
@@ -72,8 +72,6 @@ public class DienthoaiAdapter extends BaseAdapter {
             viewHolder.txtmotadienthoai.setEllipsize(TextUtils.TruncateAt.END);
             viewHolder.txtmotadienthoai.setText(sanpham.getMotasanpham());
             Picasso.get().load(sanpham.getHinhsanpham())
-                            .placeholder(R.drawable.photos_icon)
-                            .error(R.drawable.closeicon)
                             .into(viewHolder.imgdienthoai);
         return view;
     }
